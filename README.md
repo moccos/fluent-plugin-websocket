@@ -4,17 +4,7 @@ Fluentd websocket output plugin.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'fluent-plugin-websocket'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install fluent-plugin-websocket
+TODO: Write installation information here
 
 ## Usage
 

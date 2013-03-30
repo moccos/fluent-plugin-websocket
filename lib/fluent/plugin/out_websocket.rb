@@ -1,35 +1,43 @@
+require 'em-websocket'
+require 'thread'
+
 module Fluent
-  require 'em-websocket'
-
+  puts "plugin started!"
+  $lock = Mutex::new
   $channel = EM::Channel.new
-  $thread = Thread.new do
-  EM.run {
-    EM::WebSocket.run(:host => "0.0.0.0", :port => 8081) do |ws|
-      puts "EventMachine run"
-      ws.onopen { |handshake|
-        sid = $channel.subscribe { |msg| ws.send msg }
-        puts "WebSocket connection: " + sid.to_s
-        ws.onclose {
-          puts "Connection closed: " + sid.to_s
-          $channel.unsubscribe(sid)
-        }
-
-        ws.onmessage { |msg|
-          ws.send "Pong: #{msg}"
-        }
-      }
-    end
-  }
-  end
 
   class WebSocketOutput < Fluent::Output
     Fluent::Plugin.register_output('websocket', self)
+    config_param :use_msgpack, :bool, :default => false
+    config_param :port, :integer, :default => 8080
     config_param :add_time, :bool, :default => false
     config_param :add_tag, :bool, :default => true
-    config_param :port, :integer, :default => 8080
+    config_param :debug, :bool, :default => false
 
     def configure(conf)
       super
+      $thread = Thread.new do
+      EM.run {
+        EM::WebSocket.run(:host => "0.0.0.0", :port => @port) do |ws|
+          ws.onopen { |handshake|
+            callback = @use_msgpack ? proc{|msg| ws.send_binary(msg)} : proc{|msg| ws.send(msg)}
+            $lock.synchronize do
+              sid = $channel.subscribe {|msg| callback.call msg}
+              if @debug then puts "WebSocket connection: ID " + sid.to_s end
+              ws.onclose {
+                if @debug then puts "Connection closed: " + sid.to_s end
+                $lock.synchronize do
+                  $channel.unsubscribe(sid)
+                end
+              }
+            end
+
+            #ws.onmessage { |msg|
+            #}
+          }
+        end
+      }
+      end
     end
 
     def start
@@ -41,19 +49,16 @@ module Fluent
       Thread::kill($thread)
     end
 
-    # This method is called when an event reaches Fluentd.
-    # 'es' is a Fluent::EventStream object that includes multiple events.
-    # You can use 'es.each {|time,record| ... }' to retrieve events.
-    # 'chain' is an object that manages transactions. Call 'chain.next' at
-    # appropriate points and rollback if it raises an exception.
     def emit(tag, es, chain)
       chain.next
       es.each {|time,record|
-        output = [record]
-        if (add_time) then output.unshift(time) end
-        if (add_tag) then output.unshift(tag) end
-        json = output.to_json + "\n"
-        $channel.push json
+        data = [record]
+        if (@add_time) then data.unshift(time) end
+        if (@add_tag) then data.unshift(tag) end
+        output = @use_msgpack ? data.to_msgpack : data.to_json
+        $lock.synchronize do
+          $channel.push output
+        end
       }
     end
   end

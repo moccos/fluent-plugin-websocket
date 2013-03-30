@@ -3,10 +3,10 @@ lib = File.expand_path('../lib', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-websocket"
-  gem.version       = "0.0.1"
+  gem.version       = "0.1.1"
   gem.authors       = ["@moccos"]
   gem.email         = ["tt.izawa@gmail.com"]
-  gem.homepage      = "https://twitter.com/moccos"
+  gem.homepage      = "https://github.com/moccos/fluent-plugin-websocket"
   gem.summary       = %q{Fluentd websocket output plugin}
   gem.description   = %q{Fluentd websocket output plugin}
 
