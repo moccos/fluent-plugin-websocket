@@ -16,30 +16,31 @@ require 'em-websocket'
 require 'thread'
 
 module Fluent
-  puts "plugin started!"
   $lock = Mutex::new
   $channel = EM::Channel.new
 
   class WebSocketOutput < Fluent::Output
     Fluent::Plugin.register_output('websocket', self)
     config_param :use_msgpack, :bool, :default => false
+    config_param :host, :string, :default => "0.0.0.0"
     config_param :port, :integer, :default => 8080
     config_param :add_time, :bool, :default => false
     config_param :add_tag, :bool, :default => true
-    config_param :debug, :bool, :default => false
 
     def configure(conf)
       super
       $thread = Thread.new do
+      $log.trace "Started em-websocket thread."
+      $log.info "WebSocket server #{@host}:#{@port} [msgpack: #{@use_msgpack}]"
       EM.run {
-        EM::WebSocket.run(:host => "0.0.0.0", :port => @port) do |ws|
+        EM::WebSocket.run(:host => @host, :port => @port) do |ws|
           ws.onopen { |handshake|
             callback = @use_msgpack ? proc{|msg| ws.send_binary(msg)} : proc{|msg| ws.send(msg)}
             $lock.synchronize do
               sid = $channel.subscribe {|msg| callback.call msg}
-              if @debug then puts "WebSocket connection: ID " + sid.to_s end
+              $log.trace "WebSocket connection: ID " + sid.to_s
               ws.onclose {
-                if @debug then puts "Connection closed: " + sid.to_s end
+                $log.trace "Connection closed: ID " + sid.to_s
                 $lock.synchronize do
                   $channel.unsubscribe(sid)
                 end
@@ -61,6 +62,7 @@ module Fluent
     def shutdown
       super
       Thread::kill($thread)
+      $log.trace "Killed em-websocket thread."
     end
 
     def emit(tag, es, chain)

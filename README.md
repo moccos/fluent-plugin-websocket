@@ -14,13 +14,15 @@ This plugin depends on [__em-websocket__](https://github.com/igrigorik/em-websoc
 ## Configuration
     <match foo.**>
       type websocket
+      host 192.168.1.1  # default: 0.0.0.0 (ANY)
       port 8080         # default: 8080
       use_msgpack false # default: false
       add_time false    # default: false
       add_tag true      # default: true
     </match>
 
-- __port__: WebSocket listen port.
+- __host__: WebSocket server IP address.
+- __port__: WebSocket server port.
 - __use\_msgpack__: Send [MessagePack](http://msgpack.org/) format binary. Otherwise, you send JSON format text.
 - __add\_time__: Add timestamp to the data.
 - __add\_tag__: Add fluentd tag to the data.
