@@ -4,7 +4,7 @@ lib = File.expand_path('../lib', __FILE__)
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-websocket"
   gem.version       = "0.1.2"
-  gem.authors       = ["@moccos"]
+  gem.authors       = ["IZAWA Tetsu (@moccos)"]
   gem.email         = ["tt.izawa@gmail.com"]
   gem.homepage      = "https://github.com/moccos/fluent-plugin-websocket"
   gem.summary       = %q{Fluentd websocket output plugin}
@@ -17,6 +17,8 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency "rake"
   gem.add_development_dependency "fluentd"
+  gem.add_development_dependency "websocket-ocket-eventmachine-client"
+  gem.add_development_dependency "msgpack"
   gem.add_runtime_dependency "fluentd"
   gem.add_runtime_dependency "em-websocket"
 end

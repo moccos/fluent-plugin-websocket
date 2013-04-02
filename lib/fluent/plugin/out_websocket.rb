@@ -1,4 +1,4 @@
-# Copyright (C) 2013 IZAWA Tetsu (moccos)
+# Copyright (C) 2013 IZAWA Tetsu (@moccos)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ module Fluent
           ws.onopen { |handshake|
             callback = @use_msgpack ? proc{|msg| ws.send_binary(msg)} : proc{|msg| ws.send(msg)}
             $lock.synchronize do
-              sid = $channel.subscribe {|msg| callback.call msg}
+              sid = $channel.subscribe callback
               $log.trace "WebSocket connection: ID " + sid.to_s
               ws.onclose {
                 $log.trace "Connection closed: ID " + sid.to_s
@@ -61,6 +61,7 @@ module Fluent
 
     def shutdown
       super
+      EM.stop
       Thread::kill($thread)
       $log.trace "Killed em-websocket thread."
     end
