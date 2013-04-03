@@ -1,17 +1,18 @@
-# Fluent::Plugin::Websocket
+= Fluent::Plugin::Websocket
 
 Fluentd websocket output plugin.
 
-## Installation
+This plugin works as websocket server which can output JSON string or {MessagePack}[http://msgpack.org/] binary.
 
-Copy __out_websocket.rb__ into your fluentd plugin directory.
+In the current version, emitted data will be broadcasted to the all connected clients.
 
-Default plugin directory is _/etc/fluent/plugin_. You can specify additional location by _-p_ option. (Please see _fluentd -h_)
+== Installation
 
-This plugin depends on [__em-websocket__](https://github.com/igrigorik/em-websocket) module. You can  install it by _gem install em-websocket_.
+_gem install fluent-plugin-websocket_
 
+This plugin depends on {*em-websocket*}[https://github.com/igrigorik/em-websocket].
 
-## Configuration
+== Configuration
     <match foo.**>
       type websocket
       host 192.168.1.1  # default: 0.0.0.0 (ANY)
@@ -21,11 +22,11 @@ This plugin depends on [__em-websocket__](https://github.com/igrigorik/em-websoc
       add_tag true      # default: true
     </match>
 
-- __host__: WebSocket server IP address.
-- __port__: WebSocket server port.
-- __use\_msgpack__: Send [MessagePack](http://msgpack.org/) format binary. Otherwise, you send JSON format text.
-- __add\_time__: Add timestamp to the data.
-- __add\_tag__: Add fluentd tag to the data.
+* *host*: WebSocket server IP address.
+* *port*: WebSocket server port.
+* *use\_msgpack*: Send {MessagePack}[http://msgpack.org/] format binary. Otherwise, you send JSON format text.
+* *add\_time*: Add timestamp to the data.
+* *add\_tag*: Add fluentd tag to the data.
 
 If there are no websocket connections, this plugin silently discards data. You may use _out\_copy_ plugin like this:
 
@@ -41,26 +42,26 @@ If there are no websocket connections, this plugin silently discards data. You m
       </store>
     </match>
 
-## Data format
+== Data format
     [tag, timestamp, data_object]
 
-- tag is appended when _add\_tag_ option is true.
-- timespamp is appended when _add\_time_ option is true.
+* tag is appended when _add\_tag_ option is true.
+* timespamp is appended when _add\_time_ option is true.
 
-### Example
+=== Example
     curl -X POST -d 'json={"action":"login","user":6}' http://localhost:8888/foo/bar
 
     ["foo.bar",1364699026,{"action":"login","user":6}]
 
-## Client sample
-### JSON format (use_msgpack: false)
+== Client sample
+=== JSON format (use\_msgpack: false)
     function onMessage(evt) {
       data = JSON.parse(evt.data);
       ...
     }
 
-### Msgpack format binary (use_msgpack: true)
-Extract data by [msgpack.js](https://github.com/msgpack/msgpack-javascript).
+=== Msgpack format binary (use\_msgpack: true)
+Extract data by {msgpack.js}[https://github.com/msgpack/msgpack-javascript].
 
     websocket.binaryType = "arraybuffer"
     ...
@@ -69,7 +70,7 @@ Extract data by [msgpack.js](https://github.com/msgpack/msgpack-javascript).
       ...
     }
 
-## Contributing
+== Contributing
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
@@ -77,3 +78,7 @@ Extract data by [msgpack.js](https://github.com/msgpack/msgpack-javascript).
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
+== Copyright
+
+Copyright:: Copyright (c) 2013 IZAWA Tetsu (@moccos)
+License:: Apache License, Version 2.0
