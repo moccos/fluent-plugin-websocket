@@ -8,7 +8,7 @@ In the current version, emitted data will be broadcasted to the all connected cl
 
 == Installation
 
-_gem install fluent-plugin-websocket_
+    gem install fluent-plugin-websocket
 
 This plugin depends on {*em-websocket*}[https://github.com/igrigorik/em-websocket].
 
@@ -24,11 +24,11 @@ This plugin depends on {*em-websocket*}[https://github.com/igrigorik/em-websocke
 
 * *host*: WebSocket server IP address.
 * *port*: WebSocket server port.
-* *use\_msgpack*: Send {MessagePack}[http://msgpack.org/] format binary. Otherwise, you send JSON format text.
-* *add\_time*: Add timestamp to the data.
-* *add\_tag*: Add fluentd tag to the data.
+* <b>use_msgpack</b>: Send {MessagePack}[http://msgpack.org/] format binary. Otherwise, you send JSON format text.
+* <b>add_time</b>: Add timestamp to the data.
+* <b>add_tag</b>: Add fluentd tag to the data.
 
-If there are no websocket connections, this plugin silently discards data. You may use _out\_copy_ plugin like this:
+If there are no websocket connections, this plugin silently discards data. You may use <em>out_copy</em> plugin like this:
 
     <match foo.**>
       type copy
@@ -45,8 +45,8 @@ If there are no websocket connections, this plugin silently discards data. You m
 == Data format
     [tag, timestamp, data_object]
 
-* tag is appended when _add\_tag_ option is true.
-* timespamp is appended when _add\_time_ option is true.
+* tag is appended when <em>add_tag</em> option is true.
+* timespamp is appended when <em>add_time</em> option is true.
 
 === Example
     curl -X POST -d 'json={"action":"login","user":6}' http://localhost:8888/foo/bar
@@ -54,13 +54,13 @@ If there are no websocket connections, this plugin silently discards data. You m
     ["foo.bar",1364699026,{"action":"login","user":6}]
 
 == Client sample
-=== JSON format (use\_msgpack: false)
+=== JSON format (use_msgpack: false)
     function onMessage(evt) {
       data = JSON.parse(evt.data);
       ...
     }
 
-=== Msgpack format binary (use\_msgpack: true)
+=== Msgpack format binary (use_msgpack: true)
 Extract data by {msgpack.js}[https://github.com/msgpack/msgpack-javascript].
 
     websocket.binaryType = "arraybuffer"
