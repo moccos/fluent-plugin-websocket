@@ -20,6 +20,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "fluentd"
   gem.add_development_dependency "websocket-eventmachine-client"
   gem.add_development_dependency "msgpack"
+  gem.add_runtime_dependency "yajl"
   gem.add_runtime_dependency "fluentd"
   gem.add_runtime_dependency "em-websocket"
 end
