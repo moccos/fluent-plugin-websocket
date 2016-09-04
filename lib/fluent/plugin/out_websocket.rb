@@ -32,31 +32,31 @@ module Fluent
     def configure(conf)
       super
       @thread = Thread.new do
-      $log.trace "Started em-websocket thread."
-      $log.info "WebSocket server #{@host}:#{@port} [msgpack: #{@use_msgpack}]"
-      EM.run {
-        EM::WebSocket.run(:host => @host, :port => @port) do |ws|
-          ws.onopen { |handshake|
-            callback = @use_msgpack ? proc{|msg| ws.send_binary(msg)} : proc{|msg| ws.send(msg)}
-            $lock.synchronize do
-              sid = $channel.subscribe callback
-              $log.trace "WebSocket connection: ID " + sid.to_s
-              ws.onclose {
-                $log.trace "Connection closed: ID " + sid.to_s
-                $lock.synchronize do
-                  $channel.unsubscribe(sid)
+        $log.trace "Started em-websocket thread."
+        $log.info "WebSocket server #{@host}:#{@port} [msgpack: #{@use_msgpack}]"
+        EM.run {
+          EM::WebSocket.run(:host => @host, :port => @port) do |ws|
+            ws.onopen { |handshake|
+              callback = @use_msgpack ? proc{|msg| ws.send_binary(msg)} : proc{|msg| ws.send(msg)}
+              $lock.synchronize do
+                sid = $channel.subscribe callback
+                $log.trace "WebSocket connection: ID " + sid.to_s
+                ws.onclose {
+                  $log.trace "Connection closed: ID " + sid.to_s
+                  $lock.synchronize do
+                    $channel.unsubscribe(sid)
+                  end
+                }
+                @buffer.each do |msg|
+                  ws.send(msg)
                 end
-              }
-              @buffer.each do |msg|
-                ws.send(msg)
               end
-            end
 
-            #ws.onmessage { |msg|
-            #}
-          }
-        end
-      }
+              #ws.onmessage { |msg|
+              #}
+            }
+          end
+        }
       end
     end
 
