@@ -15,11 +15,12 @@ This plugin depends on {*em-websocket*}[https://github.com/igrigorik/em-websocke
 == Configuration
     <match foo.**>
       type websocket
-      host 192.168.1.1  # default: 0.0.0.0 (ANY)
-      port 8080         # default: 8080
-      use_msgpack false # default: false
-      add_time false    # default: false
-      add_tag true      # default: true
+      host 192.168.1.1    # default: 0.0.0.0 (ANY)
+      port 8080           # default: 8080
+      use_msgpack false   # default: false
+      add_time false      # default: false
+      add_tag true        # default: true
+      buffered_messages 100 # default: 0
     </match>
 
 * *host*: WebSocket server IP address.
@@ -27,6 +28,7 @@ This plugin depends on {*em-websocket*}[https://github.com/igrigorik/em-websocke
 * <b>use_msgpack</b>: Send {MessagePack}[http://msgpack.org/] format binary. Otherwise, you send JSON format text.
 * <b>add_time</b>: Add timestamp to the data.
 * <b>add_tag</b>: Add fluentd tag to the data.
+* <b>buffered_messages</b>: Numbered events to be buffered
 
 If there are no websocket connections, this plugin silently discards data. You may use <em>out_copy</em> plugin like this:
 
@@ -41,6 +43,8 @@ If there are no websocket connections, this plugin silently discards data. You m
         port 8080
       </store>
     </match>
+
+If <em>buffered_messages</em> is greater than <em>0</em>, the last stored data is sent to the client upon connection.
 
 == Data format
     [tag, timestamp, data\_object]
@@ -79,7 +83,7 @@ Extract data by {msgpack.js}[https://github.com/msgpack/msgpack-javascript].
 5. Create new Pull Request
 
 == Recent changes
-* 0.1.6 Added lisence to gemspec.
+* 0.1.6 Added license to gemspec.
 * 0.1.5 Fixed dependencies. (Thanks to {ca-gacky}[https://github.com/ca-gacky])
 * 0.1.4 Changed json parser to yajl. (Thanks to {Kogarasi}[https://github.com/Kogarasi])
 * 0.1.3 Bug fix.

@@ -27,6 +27,7 @@ module Fluent
     config_param :port, :integer, :default => 8080
     config_param :add_time, :bool, :default => false
     config_param :add_tag, :bool, :default => true
+    config_param :buffered_messages, :integer, :default => 0
 
     def configure(conf)
       super
@@ -46,6 +47,9 @@ module Fluent
                   $channel.unsubscribe(sid)
                 end
               }
+              @buffer.each do |msg|
+                $channel.push msg
+              end
             end
 
             #ws.onmessage { |msg|
@@ -57,6 +61,7 @@ module Fluent
     end
 
     def start
+      @buffer = []
       super
     end
 
@@ -74,10 +79,17 @@ module Fluent
         if (@add_time) then data.unshift(time) end
         if (@add_tag) then data.unshift(tag) end
         output = @use_msgpack ? data.to_msgpack : Yajl::Encoder.encode( data )
+        buffer(output)
         $lock.synchronize do
           $channel.push output
         end
       }
+    end
+
+    def buffer(data)
+      return unless @buffered_messages > 0
+      @buffer << data
+      @buffer = @buffer.shift(@buffer.length - @buffered_messages) if @buffer.length > @buffered_messages
     end
   end
 end
