@@ -31,7 +31,7 @@ module Fluent
 
     def configure(conf)
       super
-      $thread = Thread.new do
+      @thread = Thread.new do
       $log.trace "Started em-websocket thread."
       $log.info "WebSocket server #{@host}:#{@port} [msgpack: #{@use_msgpack}]"
       EM.run {
@@ -48,7 +48,7 @@ module Fluent
                 end
               }
               @buffer.each do |msg|
-                $channel.push msg
+                ws.send(msg)
               end
             end
 
@@ -68,7 +68,7 @@ module Fluent
     def shutdown
       super
       EM.stop
-      Thread::kill($thread)
+      Thread::kill(@thread)
       $log.trace "Killed em-websocket thread."
     end
 
@@ -90,7 +90,7 @@ module Fluent
       return unless @buffered_messages > 0
       @buffer << data
       # Buffer only new @buffered_messages messages
-      @buffer = @buffer.shift(@buffer.length - @buffered_messages) if @buffer.length > @buffered_messages
+      @buffer = @buffer[-@buffered_messages, @buffered_messages] if @buffer.length > @buffered_messages
     end
   end
 end
