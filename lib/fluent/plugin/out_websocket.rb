@@ -89,6 +89,7 @@ module Fluent
     def buffer(data)
       return unless @buffered_messages > 0
       @buffer << data
+      # Buffer only new @buffered_messages messages
       @buffer = @buffer.shift(@buffer.length - @buffered_messages) if @buffer.length > @buffered_messages
     end
   end

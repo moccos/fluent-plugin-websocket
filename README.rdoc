@@ -28,7 +28,7 @@ This plugin depends on {*em-websocket*}[https://github.com/igrigorik/em-websocke
 * <b>use_msgpack</b>: Send {MessagePack}[http://msgpack.org/] format binary. Otherwise, you send JSON format text.
 * <b>add_time</b>: Add timestamp to the data.
 * <b>add_tag</b>: Add fluentd tag to the data.
-* <b>buffered_messages</b>: Numbered events to be buffered
+* <b>buffered_messages</b>: The number of messages to be buffered. The new connection receives them.
 
 If there are no websocket connections, this plugin silently discards data. You may use <em>out_copy</em> plugin like this:
 
@@ -44,10 +44,10 @@ If there are no websocket connections, this plugin silently discards data. You m
       </store>
     </match>
 
-If <em>buffered_messages</em> is greater than <em>0</em>, the last stored data is sent to the client upon connection.
+If <em>buffered_messages</em> is greater than <em>0</em>, the last stored data is sent to the client upon new connection.
 
 == Data format
-    [tag, timestamp, data\_object]
+    [tag, timestamp, data_object]
 
 * tag is appended when <em>add_tag</em> option is true.
 * timestamp is appended when <em>add_time</em> option is true.
@@ -83,6 +83,7 @@ Extract data by {msgpack.js}[https://github.com/msgpack/msgpack-javascript].
 5. Create new Pull Request
 
 == Recent changes
+* 0.1.7 Add message buffering. (Thanks to {SebastianOsuna}[https://github.com/SebastianOsuna])
 * 0.1.6 Added license to gemspec.
 * 0.1.5 Fixed dependencies. (Thanks to {ca-gacky}[https://github.com/ca-gacky])
 * 0.1.4 Changed json parser to yajl. (Thanks to {Kogarasi}[https://github.com/Kogarasi])
