@@ -1,4 +1,4 @@
-= Fluent::Plugin::Websocket
+= fluent-plugin-websocket
 
 Fluentd websocket output plugin.
 
@@ -9,8 +9,6 @@ In the current version, emitted data will be broadcasted to the all connected cl
 == Installation
 
     gem install fluent-plugin-websocket
-
-This plugin depends on {*em-websocket*}[https://github.com/igrigorik/em-websocket].
 
 == Configuration
     <match foo.**>
