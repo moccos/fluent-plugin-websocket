@@ -19,6 +19,7 @@ In the current version, emitted data will be broadcasted to the all connected cl
       add_time false      # default: false
       add_tag true        # default: true
       buffered_messages 100 # default: 0
+      token SomeToken     # default: MyT0ken
     </match>
 
 * *host*: WebSocket server IP address.
@@ -27,6 +28,7 @@ In the current version, emitted data will be broadcasted to the all connected cl
 * <b>add_time</b>: Add timestamp to the data.
 * <b>add_tag</b>: Add fluentd tag to the data.
 * <b>buffered_messages</b>: The number of messages to be buffered. The new connection receives them.
+* <b>token</b>: Authentication token. Passed as get param.
 
 If there are no websocket connections, this plugin silently discards data. You may use <em>out_copy</em> plugin like this:
 
