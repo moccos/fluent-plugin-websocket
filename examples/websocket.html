@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+</head>
+  <meta charset="utf-8" />
+  <title>WebSocket Test</title>
+</head>
+<!-- based on http://www.websocket.org/echo.html -->
+<body>
+<!-- https://github.com/creationix/msgpack-js-browser --><script src="./msgpack.js"></script>
+<script language="javascript" type="text/javascript">
+
+  var wsUri = "ws://localhost:38080/";
+  var output;
+  var latestData;  // for debugging
+
+  function init()
+  {
+    output = document.getElementById("output");
+    testWebSocket();
+  }
+
+  function testWebSocket()
+  {
+    websocket = new WebSocket(wsUri);
+    websocket.binaryType = "arraybuffer";
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+
+  function onOpen(evt)
+  {
+    writeToScreen("CONNECTED");
+    doSend("onOpen");
+  }
+
+  function onClose(evt)
+  {
+    writeToScreen("DISCONNECTED");
+  }
+
+  function onMessage(evt)
+  {
+    latestData = evt.data
+    if (typeof(evt.data) == 'string') {
+      text = evt.data;
+    } else {
+      decoded = msgpack.decode(evt.data);
+      text = JSON.stringify(decoded.slice(1));
+    }
+    writeToScreen('<span style="color: blue;">RESPONSE: ' + text +'</span>');
+  }
+
+  function onError(evt)
+  {
+    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+  }
+
+  function doSend(message)
+  {
+    writeToScreen("SENT: " + message);
+    websocket.send(message);
+  }
+
+  function writeToScreen(message)
+  {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+
+  window.addEventListener("load", init, false);
+
+  </script>
+
+  <h2>WebSocket Test</h2>
+
+  <div id="output"></div>
+</body>
+
