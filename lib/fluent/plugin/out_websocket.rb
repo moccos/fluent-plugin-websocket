@@ -28,7 +28,7 @@ module Fluent
     config_param :add_time, :bool, :default => false
     config_param :add_tag, :bool, :default => true
     config_param :buffered_messages, :integer, :default => 0
-    config_param :token, :string, :default => 'MyT0ken'
+    config_param :token, :string, :default => nil
 
     def configure(conf)
       super
@@ -71,7 +71,7 @@ module Fluent
     end
 
     def doAuth(query)
-      if query.key?("token") and @token == query["token"]
+      if @token.nil? || ( query.key?("token") && @token == query["token"] )
         $log.trace "Auth OK"
         return true
       end
