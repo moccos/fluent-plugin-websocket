@@ -19,6 +19,7 @@ In the current version, emitted data will be broadcasted to the all connected cl
       add_time false      # default: false
       add_tag true        # default: true
       buffered_messages 100 # default: 0
+      token SomeToken     # default: nil
     </match>
 
 * *host*: WebSocket server IP address.
@@ -27,6 +28,7 @@ In the current version, emitted data will be broadcasted to the all connected cl
 * <b>add_time</b>: Add timestamp to the data.
 * <b>add_tag</b>: Add fluentd tag to the data.
 * <b>buffered_messages</b>: The number of messages to be buffered. The new connection receives them.
+* <b>token</b>: Authentication token. Passed as get param. If set to nil, authentication is disabled.
 
 If there are no websocket connections, this plugin silently discards data. You may use <em>out_copy</em> plugin like this:
 
@@ -71,6 +73,18 @@ Extract data by {msgpack.js}[https://github.com/msgpack/msgpack-javascript].
       data = msgpack.unpack(new Uint8Array(evt.data))
       ...
     }
+
+=== Example authentication and filtering
+
+    curl --include \
+         --no-buffer \
+         --header "Connection: Upgrade" \
+         --header "Upgrade: websocket" \
+         --header "Host: 127.0.0.1:8888" \
+         --header "Origin: http://127.0.0.1:8888" \
+         --header "Sec-WebSocket-Key: SGVabG8sIHOvcmxDIQ==" \
+         --header "Sec-WebSocket-Version: 13" \
+         "http://127.0.0.1:8888/?field_name=myappname&token=MyT0ken"
 
 == Recent changes
 * 0.1.7 Add message buffering. (Thanks to {SebastianOsuna}[https://github.com/SebastianOsuna])
