@@ -39,27 +39,27 @@ module Fluent
           EM::WebSocket.run(:host => @host, :port => @port) do |ws|
             ws.onopen { |handshake|
               $log.info "WebSocket opened #{{
-                      :path => handshake.path,
-                      :query => handshake.query,
-                      :origin => handshake.origin,
+                :path => handshake.path,
+                :query => handshake.query,
+                :origin => handshake.origin,
               }}"
               if doAuth(handshake.query)
-                      callback = @use_msgpack ? proc{|msg| ws.send_binary(msg)} : proc{|msg| sendMsg(handshake.query, ws, msg)}
-                      $lock.synchronize do
-                        sid = $channel.subscribe callback
-                        $log.trace "WebSocket connection: ID " + sid.to_s
-                        ws.onclose {
-                          $log.trace "Connection closed: ID " + sid.to_s
-                          $lock.synchronize do
-                            $channel.unsubscribe(sid)
-                          end
-                        }
-                        @buffer.each do |msg|
-                          sendMsg(handshake.query, ws, msg)
-                        end
-                      end
+                callback = @use_msgpack ? proc{|msg| ws.send_binary(msg)} : proc{|msg| sendMsg(handshake.query, ws, msg)}
+                $lock.synchronize do
+                  sid = $channel.subscribe callback
+                  $log.trace "WebSocket connection: ID " + sid.to_s
+                  ws.onclose {
+                    $log.trace "Connection closed: ID " + sid.to_s
+                    $lock.synchronize do
+                      $channel.unsubscribe(sid)
+                    end
+                  }
+                  @buffer.each do |msg|
+                    sendMsg(handshake.query, ws, msg)
+                  end
+                end
               else
-                  ws.send("Unauthorized")
+                ws.send("Unauthorized")
               end
 
               #ws.onmessage { |msg|
