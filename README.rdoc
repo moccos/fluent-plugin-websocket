@@ -1,5 +1,5 @@
 = fluent-plugin-websocket
-{https://badge.fury.io/rb/fluent-plugin-websocket.svg}[https://badge.fury.io/rb/fluent-plugin-websocket]
+{<img src="https://badge.fury.io/rb/fluent-plugin-websocket.svg" alt="Gem Version" />}[https://badge.fury.io/rb/fluent-plugin-websocket]
 
 Fluentd websocket output plugin.
 
